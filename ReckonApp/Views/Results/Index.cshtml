@@ -1,0 +1,62 @@
+﻿@{
+    ViewBag.Title = "Candidate Results";
+}
+<h2 class="mt-4">Candidate Results</h2>
+
+<div class="mb-3">
+    <button id="showResultsBtn" class="btn btn-primary me-2">Show Results</button>
+    <button id="resetBtn" class="btn btn-secondary">Reset</button>
+</div>
+
+<div id="resultsContainer" style="display: none;" class="card p-4 mt-4">
+    <p><strong>Candidate:</strong> <span id="candidateName" class="fst-italic"></span></p>
+    <p><strong>Text:</strong> <span id="textContent" class="fst-italic"></span></p>
+    <h3>Results:</h3>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Subtext</th>
+                <th scope="col">Result</th>
+            </tr>
+        </thead>
+        <tbody id="resultsTableBody"></tbody>
+    </table>
+</div>
+
+@section scripts {   
+    <script>
+        $(document).ready(function () {
+            $('#showResultsBtn').click(function () {
+                $.ajax({
+                    url: '/', 
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#candidateName').text(data.candidate);
+                        $('#textContent').text(data.text);
+                        $('#resultsTableBody').empty();
+
+                        $.each(data.results, function (index, item) {
+                            var $row = $('<tr></tr>');
+                            $('<td></td>').text(item.subtext).appendTo($row);
+                            $('<td></td>').text(item.result).appendTo($row);
+                            $('#resultsTableBody').append($row);
+                        });
+
+                        $('#resultsContainer').show();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error fetching data: ' + error);
+                    }
+                });
+            });
+
+            $('#resetBtn').click(function () {
+                $('#candidateName').text('');
+                $('#textContent').text('');
+                $('#resultsTableBody').empty();
+                $('#resultsContainer').hide();
+            });
+        });
+    </script>
+}
